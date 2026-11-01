@@ -1,0 +1,140 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TRADEHUB PRO V2 - TABS</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui}
+body{background:#0a0d14;color:#eaf2ff;display:flex;justify-content:center;padding:8px}
+.app{width:100%;max-width:460px;background:#101118;border-radius:22px;overflow:hidden;border:1px solid #1f2538}
+.head{padding:14px;display:flex;justify-content:space-between;align-items:center;background:#101118}
+.head h1{color:#8aff5a;font-size:18px}
+.box{background:#181b29;margin:8px;border-radius:18px;padding:12px;border:1px solid #22293f}
+.tabs{display:flex;gap:0;background:#2a2d3d;border-radius:14px 14px 0 0;overflow-x:auto}
+.t{padding:12px 16px;white-space:nowrap;font-size:12px;font-weight:800;color:#8a90a8;cursor:pointer;border-bottom:3px solid transparent}
+.t.active{color:#8aff5a;border-bottom-color:#8aff5a;background:#1e1e2e}
+.tabcontent{display:none}.tabcontent.show{display:block}
+.btn{border:2px solid #8aff5a;border-radius:14px;padding:18px;font-weight:900;font-size:18px;cursor:pointer;width:100%;background:transparent;color:#8aff5a}
+.btn.filled{background:#8aff5a;color:#000}
+.digitRow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
+.dg{background:#1f2336;border:1px solid #2a3050;border-radius:10px;padding:8px;text-align:center;font-size:11px}
+.dg b{font-size:14px;color:#8aff5a}
+.collapse{display:flex;justify-content:space-between;align-items:center;background:#181b29;border:1px solid #2a2d3d;border-radius:12px;padding:12px;margin:8px;cursor:pointer}
+.log{height:70px;background:#0c0e18;border-radius:10px;padding:6px;font-size:11px;overflow:auto;margin:8px}
+canvas{width:100%;height:140px;border-radius:10px}
+.setRow{display:flex;justify-content:space-between;align-items:center;background:#1e2132;border-radius:12px;padding:10px;margin:6px 0}
+.setCtrl{display:flex;align-items:center;gap:12px;border:1px solid #3a415c;border-radius:12px;padding:6px 12px}
+.setCtrl button{background:transparent;border:0;color:#8aff5a;font-size:20px;font-weight:900;cursor:pointer}
+.foot{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 12px 14px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;justify-content:center;align-items:center;z-index:99;padding:12px}
+.modal.show{display:flex}.mbox{background:#181b29;border:1px solid #8aff5a;border-radius:16px;padding:16px;width:100%;max-width:380px}
+input{width:100%;background:#0f111c;border:1px solid #2a3050;color:#fff;border-radius:8px;padding:10px;margin:4px 0}
+.ai-on{animation:pulse 1.2s infinite}@keyframes pulse{0%{box-shadow:0 0 0 0 #8aff5a88}100%{box-shadow:0 0 0 12px #8aff5a00}}
+</style></head><body>
+<div class="app">
+<div class="head"><h1>TRADEHUB PRO V2</h1><div>🔔 👤</div></div>
+
+<div class="box">
+<div style="display:flex;justify-content:space-between"><b style="color:#8aff5a">Volatility 100 Index</b><span style="background:#8aff5a;color:#000;border-radius:10px;padding:2px 10px;font-size:12px;font-weight:800">1m</span></div>
+<canvas id="chart" width="420" height="140"></canvas>
+<div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:11px;color:#888" id="tlab">09:30 09:40 09:50 10:00</span><span style="border:1px solid #8aff5a;color:#8aff5a;border-radius:10px;padding:2px 10px;font-size:12px">RSI <b id="rsi">62.4</b></span></div>
+<div style="font-size:11px;margin-top:4px">Price: <b id="price">--</b> | <span id="status" style="color:#8aff5a">Not Connected</span></div>
+</div>
+
+<div class="box" style="padding:0;overflow:hidden">
+<div class="tabs">
+<div class="t active" data-tab="rf">RISE/FALL</div>
+<div class="t" data-tab="ou">OVER/UNDER</div>
+<div class="t" data-tab="eo">EVEN/ODD</div>
+<div class="t" data-tab="md">MATCH/DIFF</div>
+</div>
+
+<div id="tab-rf" class="tabcontent show" style="padding:12px">
+<div style="font-size:12px;color:#aaa;margin-bottom:12px">Predict if the price will RISE or FALL in the next tick.</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<button class="btn filled" data-type="CALL">^<br>RISE</button>
+<button class="btn" data-type="PUT">v<br>FALL</button>
+</div>
+</div>
+
+<div id="tab-ou" class="tabcontent" style="padding:12px">
+<div style="font-size:12px;color:#aaa;margin-bottom:8px">Digit Analysis - Select barrier</div>
+<div style="display:flex;gap:8px;margin-bottom:8px"><select id="barrier" style="flex:1"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<button class="btn filled" data-type="DIGITOVER">OVER</button>
+<button class="btn" data-type="DIGITUNDER">UNDER</button>
+</div>
+</div>
+
+<div id="tab-eo" class="tabcontent" style="padding:12px">
+<div class="digitRow" id="digitGrid"></div>
+<div style="display:flex;gap:8px;margin-top:10px;font-size:12px"><div style="flex:1;background:#1f2a1f;padding:8px;border-radius:8px;text-align:center">Even<br><b id="evenP" style="color:#8aff5a">45%</b></div><div style="flex:1;background:#2a2315;padding:8px;border-radius:8px;text-align:center">Odd<br><b id="oddP" style="color:#ffb347">55%</b></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+<button class="btn" data-type="DIGITEVEN">EVEN</button>
+<button class="btn" data-type="DIGITODD">ODD</button>
+</div>
+</div>
+
+<div id="tab-md" class="tabcontent" style="padding:12px">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<button class="btn filled" data-type="DIGITMATCH">MATCH</button>
+<button class="btn" data-type="DIGITDIFF">DIFF</button>
+</div>
+</div>
+</div>
+
+<div class="collapse" id="digitToggle"><b>Digit Analysis 0-9</b><span>Even <span id="evenT">45%</span> • Odd <span id="oddT">55%</span> ▼</span></div>
+
+<div class="box">
+<div style="color:#8aff5a;text-align:center;font-weight:800;margin-bottom:8px">TRADE SETTINGS</div>
+<div class="setRow"><span>Stake</span><div class="setCtrl"><button onclick="adj('stake',-1)">−</button><b id="stakeV">$10</b><button onclick="adj('stake',1)">+</button></div></div>
+<div class="setRow"><span>Target Profit</span><div class="setCtrl"><button onclick="adj('target',-1)">−</button><b id="targetV">$18.50</b><button onclick="adj('target',1)">−</button></div></div>
+<div style="display:flex;gap:6px;font-size:11px"><span>REAL: <b id="balReal">--</b></span><span>DEMO: <b id="balDemo">--</b></span><span>Profit: $<b id="profit">0</b></span></div>
+<div style="display:flex;gap:6px;margin-top:6px"><button class="t active" id="chooseReal" style="flex:1;border-radius:8px">Trade REAL</button><button class="t" id="chooseDemo" style="flex:1;border-radius:8px">Trade DEMO</button></div>
+</div>
+
+<div class="foot">
+<button class="btn" id="connBtn">CONNECT</button>
+<button class="btn filled" id="autoBtn">✨ AI AUTO BOT</button>
+</div>
+<div class="log" id="log">Ready. Connect to Deriv to start.</div>
+</div>
+
+<div class="modal" id="modal"><div class="mbox">
+<h3 style="color:#8aff5a">LOGIN WITH DERIV</h3><p style="font-size:11px;color:#888">EMAIL & PASSWORD - AUTO</p>
+<input id="email" placeholder="you@email.com">
+<input id="pwd" type="password" placeholder="Password">
+<input id="tokenReal" type="password" placeholder="REAL Token (app.deriv.com/account/api-token)">
+<input id="tokenDemo" type="password" placeholder="DEMO Token">
+<a id="oauthBtn" style="display:block;background:#ff444f;color:#fff;text-align:center;padding:10px;border-radius:8px;margin:8px 0;text-decoration:none;font-weight:800">🔴 LOGIN WITH DERIV EMAIL (Auto)</a>
+<div style="display:flex;gap:6px"><button class="t" id="cancelBtn" style="flex:1">Cancel</button><button class="t active" id="saveBtn" style="flex:1">Save & Connect</button></div>
+</div></div>
+
+<script>
+let ws=null,prices=[],digits=[],profit=0,lossStreak=0,isRunning=false,currentType='CALL';
+let stake=10,target=18.5;
+let tokens=JSON.parse(localStorage.getItem('deriv_tokens')||'{"REAL":"","DEMO":""}');
+let tradeMode=localStorage.getItem('deriv_mode')||'DEMO';
+const $=id=>document.getElementById(id);
+const log=m=>{$('log').innerHTML=new Date().toLocaleTimeString()+' - '+m+'<br>'+$('log').innerHTML;}
+function adj(k,d){if(k==='stake'){stake=Math.max(1,stake+d);$('stakeV').textContent='$'+stake;}else{target=Math.max(1,target+d);$('targetV').textContent='$'+target.toFixed(2);}}
+document.querySelectorAll('.t[data-tab]').forEach(el=>{el.onclick=()=>{document.querySelectorAll('.t[data-tab]').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.querySelectorAll('.tabcontent').forEach(c=>c.classList.remove('show'));$('tab-'+el.dataset.tab).classList.add('show');};});
+function openM(){ $('modal').classList.add('show'); $('tokenReal').value=tokens.REAL; $('tokenDemo').value=tokens.DEMO; }
+function closeM(){ $('modal').classList.remove('show'); }
+$('connBtn').onclick=openM; $('cancelBtn').onclick=closeM;
+$('oauthBtn').onclick=()=>{location.href='https://oauth.deriv.com/oauth2/authorize?app_id=1089&l=EN&brand=deriv';};
+$('saveBtn').onclick=()=>{tokens.REAL=$('tokenReal').value.trim();tokens.DEMO=$('tokenDemo').value.trim();localStorage.setItem('deriv_tokens',JSON.stringify(tokens));closeM();connectAll();};
+$('chooseReal').onclick=()=>{tradeMode='REAL';localStorage.setItem('deriv_mode','REAL');connectAll();};
+$('chooseDemo').onclick=()=>{tradeMode='DEMO';localStorage.setItem('deriv_mode','DEMO');connectAll();};
+function handleOAuth(){let h=location.hash;if(h.includes('token1')){let p=new URLSearchParams(h.substring(1)),rt=null,dt=null;p.forEach((v,k)=>{if(k.startsWith('token')){let n=k.replace('token','');let a=p.get('acct'+n)||'';if(a.toLowerCase().includes('vr'))dt=v;else rt=v;}});if(rt)tokens.REAL=rt;if(dt)tokens.DEMO=dt;localStorage.setItem('deriv_tokens',JSON.stringify(tokens));history.replaceState({},'',location.pathname);log('✅ Auto connected');}}
+function connectAll(){if(tokens.REAL)connectBalance('REAL',tokens.REAL);if(tokens.DEMO)connectBalance('DEMO',tokens.DEMO);let t=tokens[tradeMode];if(t)connect(t);}
+function connectBalance(type,token){let w=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');w.onopen=()=>w.send(JSON.stringify({authorize:token}));w.onmessage=e=>{let d=JSON.parse(e.data);if(d.authorize){if(type==='REAL')$('balReal').textContent='$'+d.authorize.balance.toFixed(2);else $('balDemo').textContent='$'+d.authorize.balance.toFixed(2);}};}
+function connect(token){if(ws)ws.close();ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');ws.onopen=()=>{ws.send(JSON.stringify({authorize:token}));log('Connecting '+tradeMode);};ws.onmessage=onMsg;}
+function onMsg(e){let d=JSON.parse(e.data);if(d.error){log('ERR '+d.error.message);return;}if(d.authorize){$('status').textContent='Connected '+tradeMode;log('✅ $'+d.authorize.balance);ws.send(JSON.stringify({ticks:'R_100',subscribe:1}));}if(d.tick){let pr=d.tick.quote;prices.push(pr);if(prices.length>80)prices.shift();digits.unshift(parseInt(pr.toString().slice(-1)));if(digits.length>100)digits.pop();$('price').textContent=pr;updateDigits();draw();}if(d.buy){log('📈 Buy '+d.buy.contract_id);ws.send(JSON.stringify({proposal_open_contract:1,contract_id:d.buy.contract_id,subscribe:1}));}if(d.proposal_open_contract&&d.proposal_open_contract.is_sold){let pl=d.proposal_open_contract.profit;profit+=pl;$('profit').textContent=profit.toFixed(2);if(pl<0)lossStreak++;else lossStreak=0;if(profit>=target){log('🎉 TARGET');stopAuto();}if(lossStreak>=3){log('🛑 STOP LOSS');stopAuto();}if(isRunning)setTimeout(()=>doTrade(),1500);}}
+function updateDigits(){let cnt=Array(10).fill(0);digits.forEach(x=>cnt[x]++);let tot=digits.length||1;let perc=cnt.map(c=>c/tot*100);let html='';for(let i=0;i<10;i++)html+=`<div class="dg"><b>${i}</b><br>${perc[i].toFixed(0)}%</div>`;$('digitGrid').innerHTML=html;let even=cnt.filter((_,i)=>i%2==0).reduce((a,b)=>a+b,0)/tot*100;$('evenP').textContent=even.toFixed(0)+'%';$('oddP').textContent=(100-even).toFixed(0)+'%';$('evenT').textContent=even.toFixed(0)+'%';$('oddT').textContent=(100-even).toFixed(0)+'%';}
+function calcRSI(){if(prices.length<15)return 62.4;let g=0,l=0;for(let i=prices.length-14;i<prices.length;i++){let df=prices[i]-prices[i-1];if(df>0)g+=df;else l-=df;}if(l==0)return 80;let rs=g/l;return 100-(100/(1+rs));}
+function draw(){let c=$('chart'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);if(prices.length<2)return;let min=Math.min(...prices),max=Math.max(...prices),rg=max-min||1;let ma=prices.reduce((a,b)=>a+b,0)/prices.length;let std=Math.sqrt(prices.reduce((a,b)=>a+(b-ma)**2,0)/prices.length);ctx.setLineDash([4,4]);ctx.strokeStyle='#3a4a2a';ctx.beginPath();prices.forEach((p,i)=>{let x=i/(prices.length-1)*c.width,y=c.height-((ma+2*std-min)/rg)*c.height*0.8-10;if(i==0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();ctx.beginPath();prices.forEach((p,i)=>{let x=i/(prices.length-1)*c.width,y=c.height-((ma-2*std-min)/rg)*c.height*0.8-10;if(i==0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.strokeStyle='#8aff5a';ctx.lineWidth=2;prices.forEach((p,i)=>{let x=i/(prices.length-1)*c.width,y=c.height-((p-min)/rg)*c.height*0.8-10;if(i==0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();$('rsi').textContent=calcRSI().toFixed(1);}
+function doTrade(){if(!ws||ws.readyState!=1){openM();return;}let barrier=parseInt($('barrier').value);let params={amount:stake,basis:'stake',currency:'USD',duration:1,duration_unit:'t',symbol:'R_100'};if(['DIGITOVER','DIGITUNDER','DIGITMATCH','DIGITDIFF'].includes(currentType)){params.contract_type=currentType;params.barrier=barrier;}else if(['DIGITODD','DIGITEVEN'].includes(currentType)){params.contract_type=currentType;}else{params.contract_type=currentType;params.duration=15;params.duration_unit='s';}log('Trade '+currentType+' $'+stake+' ['+tradeMode+']');ws.send(JSON.stringify({buy:1,price:stake,parameters:params}));}
+function stopAuto(){isRunning=false;$('autoBtn').textContent='✨ AI AUTO BOT';$('autoBtn').classList.remove('ai-on');}
+document.querySelectorAll('.btn[data-type]').forEach(b=>{b.onclick=()=>{document.querySelectorAll('.btn[data-type]').forEach(x=>{x.classList.remove('filled');});b.classList.add('filled');currentType=b.dataset.type;log('Type: '+currentType);};});
+$('autoBtn').onclick=()=>{if(isRunning){stopAuto();return;}isRunning=true;$('autoBtn').textContent='⏸ STOP';$('autoBtn').classList.add('ai-on');doTrade();};
+$('digitToggle').onclick=()=>{let g=$('digitGrid');g.style.display=g.style.display==='none'?'grid':'none';};
+handleOAuth();if(tokens.REAL||tokens.DEMO)connectAll();
+</script></body></html>
